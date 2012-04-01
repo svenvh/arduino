@@ -5,6 +5,11 @@
  * See also: http://www.ladyada.net/learn/sensors/thermistor.html
  */
 
+// Some calibration data
+// 572: 20.0
+// 578: 19.4
+// 595: 17.0
+
 const int portNTC = A0;
 
 void setup() {
