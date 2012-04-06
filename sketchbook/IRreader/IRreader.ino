@@ -20,7 +20,7 @@
 #define THRESHOLD_START 10000
 
 // Pulse length (usec) which distinguishes short signals from long
-#define THRESHOLD_SHORT_LONG 1200
+uint16_t threshold_short_long = 1200/RESOLUTION;
 
 // we will store up to 100 pulse pairs (this is -a lot-)
 uint16_t pulses[100][2];  // pair is high and low pulse 
@@ -86,7 +86,7 @@ void printpulses(void) {
 
 // Produces a 32-bit word from the durations of the ON pulses.
 // In the resulting word, 0 means a short pulse and 1 means a long pulse
-// (where "short" and "long" are defined by THRESHOLD_SHORT_LONG).
+// (where "short" and "long" are defined by threshold_short_long).
 uint32_t decodePulses() {
   uint32_t bits = 0;
   for (uint8_t i = 1; i < currentpulse; i++) {
@@ -95,9 +95,32 @@ uint32_t decodePulses() {
       return bits;
     }
     bits = bits << 1;
-    if (pulses[i][0] > THRESHOLD_SHORT_LONG/RESOLUTION) {
+    if (pulses[i][0] > threshold_short_long) {
       bits = bits | 1;
     }
   }
   return bits;
+}
+
+// Reads a decimal number from the serial interface, terminated by a newline.
+// The read number represents the delay in microseconds that distinguishes a short pulse from a long pulse.
+int inputValue = 0;
+void serialEvent() {
+  while (Serial.available()) {
+    char in = (char)Serial.read();
+    if (in >= '0' && in <= '9') {
+      inputValue = inputValue * 10;
+      inputValue += in - '0';
+    }
+    else if (in == '\n' && inputValue > 0) {
+      threshold_short_long = inputValue/RESOLUTION;
+      inputValue = 0;
+      Serial.print("Setting threshold to ");
+      Serial.print(threshold_short_long*RESOLUTION, DEC);
+      Serial.println(" usec");
+    }
+    else {
+      inputValue = 0;
+    }
+  }
 }
