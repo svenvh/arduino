@@ -52,12 +52,14 @@ void interpretValue(unsigned int value) {
       return;
 
     // Commands from a JVC RM-C1899S TV remote control.
+    // Set threshold to 1200 usec
     case 0x0001C4C8:
       printf("JVC TEXT\n");
       system("xdg-open \"http://www.buienradar.nl/\"");
       break;
 
     // Commands from a Technics SL-P333 CD Player remote control.
+    // Set threshold to 1200 usec
     case 0x004CE663:
       printf("EJECT\n");
       break;
@@ -132,7 +134,7 @@ void interpretValue(unsigned int value) {
       break;
 
     // Codes from a JVC RM-SMXJ100E remote control
-    // short pulse = 450 us, long pulse = 1100 us, spacing = 450 us
+    // Set threshold to 800 usec
     case 0x80200460:
       sendKey(XK_Up);
       break;
@@ -146,6 +148,18 @@ void interpretValue(unsigned int value) {
       sendKey(XK_Left);
       break;
     case 0x80208C10:
+      sendKey(XK_Return);
+      break;
+
+    // Codes for a Panasonic VSQ 0185 remote control
+    // Set threshold to 4000 usec
+    case 0x00000169:    // 7 key
+      sendKey(XK_Left);
+      break;
+    case 0x00000166:    // 8 key
+      sendKey(XK_Right);
+      break;
+    case 0x00000156:    // 12 key
       sendKey(XK_Return);
       break;
 
